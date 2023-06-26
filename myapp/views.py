@@ -2,6 +2,39 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
+from .models import Payment
+
+#イベント作成
+def add_participant(request):
+        if request.method == 'POST':
+            
+            name = request.POST['name']
+            amount = request.POST['date']
+            
+            if not name or not amount:
+                return JsonResponse({'error': '名前と金額は必須項目です。'},status = 400)
+            
+            payment = Payment(name=name, amount=amount)
+            payment.save()
+            
+            return JsonResponse({'message': '支払い金額が正常に作成されました。', 'イベントID': event.id})
+        
+        else:
+            return JsonResponse({'message': 'このエンドポイントはPOSTリクエストのみサポートしています'}, status=405)
+            
+def calculate_return(request, event_id):
+    event = Event.objects.get(id=event_id)
+    participants = event.participants.all()
+
+    per_person = event.total_amount / len(participants)
+
+    return_amounts = {}
+
+    for participant in participants:
+        return_amount = participant.paid_amount - per_person
+        return_amounts[participant.user.username] = str(return_amount)
+
+    return JsonResponse(return_amounts)
 
 #ユーザーアカウントの登録
 def signup_view(request):
