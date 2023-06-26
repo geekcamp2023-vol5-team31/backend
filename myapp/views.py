@@ -1,30 +1,27 @@
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login,logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.http import JsonResponse
 
-from django.contrib.auth import authenticate, login
-from django.http import HttpResponse
-from django.contrib.auth.forms import SignupForm
-from django.contrib.auth.models import User
-# Create your views here.
-
-# #ユーザーアカウントの登録
+#ユーザーアカウントの登録
 def signup_view(request):
     # POST
     if request.method == 'POST':
-        #インスタンス作成
-        form = SignupForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
             #新しいユーザーオブジェクトを保存
             form.save()
-            # return HttpResponseRedirect()
-            pass
+            #成功
+            return JsonResponse({'message': 'ユーザー登録が成功しました。'})
+        else:
+            #失敗
+            return JsonResponse({'errors': form.errors}, status=400)
     # GET
     else:
-        #インスタンスを作成
-        form = SignupForm()
+        form = UserCreationForm()
         
     context = {'form': form}
-    pass
-    # return render()
+    return JsonResponse(context)
 
 #ユーザーのログイン
 def login_view(request):
@@ -42,25 +39,26 @@ def login_view(request):
             if user.is_active:
                 #ログイン
                 login(request, user)
-                #成功,画面遷移
-                pass
-                # return HttpResponseRedirect()
+                #成功
+                return JsonResponse({'message': 'ログイン成功しました'})
             else:
-                return HttpResponse("アカウントが有効ではありません")
+                return JsonResponse({'error': 'アカウントが有効ではありません'}, status=400)
         # ユーザー認証失敗
         else:
             # アカウント利用不可
-            return HttpResponse("ログインIDまたはパスワードが間違っています")
+            return JsonResponse({'error': '無効なユーザー名またはパスワードです'}, status=400)
         
     #GET
     else:
-        pass
-        # return render()
+        return JsonResponse({'message': 'このエンドポイントはPOSTリクエストのみサポートしています'}, status=405)
 
 #ユーザーのログアウト    
 def logout_view(request):
-    pass
+    logout(request)
+    return JsonResponse({'message': 'ログアウトしました'})
 
 #ログインユーザーの情報の表示
+@login_required
 def user_view(request):
-    pass
+    user = request.user
+    return JsonResponse({'username': user.username})
