@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .models import Event, Participant
+import requests
 
 #保存イベント一覧：
 def event_list(request):
@@ -36,3 +37,17 @@ def event_detail(request, event_id):
     }
     #JSON形式でクライアントに返す
     return JsonResponse(event_data, safe=False)
+
+#github api
+def get_github_user_id(access_token):
+    headers = {
+        'Authorization': f'Bearer {access_token}',
+        'Accept': 'application/vnd.github.v3+json'
+    }
+    response = requests.get('https://api.github.com/user', headers=headers)
+    if response.status_code == 200:
+        user_data = response.json()
+        user_id = user_data['id']
+        return user_id
+    else:
+        return None
