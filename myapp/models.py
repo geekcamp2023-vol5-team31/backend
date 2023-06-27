@@ -1,5 +1,4 @@
 from django.db import models
-from jsonfield import JSONField
 
 #イベント情報モデル
 class Event(models.Model):
