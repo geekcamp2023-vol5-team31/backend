@@ -1,11 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.postgres.fields import JSONField
 
-#誰がどれだけ支払ったか
-class Payment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=8, decimal_places=2)
+#イベント情報モデル
+class Event(models.Model):
+    data = JSONField()
 
-#誰から誰へいくら移動するべきか
-class Transfer(models.Model):
-    pass
+#参加者情報モデル
+class Participant(models.Model):    
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='participants')
+    data = JSONField()
