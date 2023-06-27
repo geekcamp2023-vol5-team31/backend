@@ -8,9 +8,9 @@ def event_list(request):
     event_list = []
     for event in events:
         event_list.append({
-            'id': event.id,
-            'date': event.date.strftime('%Y/%m/%d'),
-            'name': event.name
+            'id': event.data.get('id'),
+            'date': event.data.get('date'),
+            'name': event.data.get('name')
         })
     return JsonResponse(event_list, safe=False)
 
