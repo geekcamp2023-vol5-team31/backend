@@ -47,10 +47,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+# OAuth認証用に追加
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    'social_core.backends.github.GithubOAuth2',
 ]
+
+SOCIAL_AUTH_GITHUB_KEY = 'Client ID'
+SOCIAL_AUTH_GITHUB_SECRET = 'Client Secret'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,6 +79,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                # OAuth認証用に追加
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
