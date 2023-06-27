@@ -1,64 +1,37 @@
-from django.contrib.auth import authenticate, login,logout
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
+from django.views import View
+from .models import Event,Participant
 
-#ユーザーアカウントの登録
-def signup_view(request):
-    # POST
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            #新しいユーザーオブジェクトを保存
-            form.save()
-            #成功
-            return JsonResponse({'message': 'ユーザー登録が成功しました。'})
-        else:
-            #失敗
-            return JsonResponse({'errors': form.errors}, status=400)
-    # GET
-    else:
-        form = UserCreationForm()
-        
-    context = {'form': form}
-    return JsonResponse(context)
-
-#ユーザーのログイン
-def login_view(request):
-    # POST
-    if request.method == 'POST':
-        # フォーム入力のユーザーID・パスワード取得
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        # Djangoの認証機能
-        user = authenticate(request, username=username, password=password)
-
-        #ユーザー認証
-        if user:
-            #ユーザーアクティベート判定
-            if user.is_active:
-                #ログイン
-                login(request, user)
-                #成功
-                return JsonResponse({'message': 'ログイン成功しました'})
-            else:
-                return JsonResponse({'error': 'アカウントが有効ではありません'}, status=400)
-        # ユーザー認証失敗
-        else:
-            # アカウント利用不可
-            return JsonResponse({'error': '無効なユーザー名またはパスワードです'}, status=400)
-        
+#イベント情報表示画面
+class EventDetailsView(View):
     #GET
-    else:
-        return JsonResponse({'message': 'このエンドポイントはPOSTリクエストのみサポートしています'}, status=405)
-
-#ユーザーのログアウト    
-def logout_view(request):
-    logout(request)
-    return JsonResponse({'message': 'ログアウトしました'})
-
-#ログインユーザーの情報の表示
-@login_required
-def user_view(request):
-    user = request.user
-    return JsonResponse({'username': user.username})
+    def get(self, request, *args, **kwargs):
+        
+        #イベントIDを取得
+        event_id = self.kwargs.get('event_id')
+        
+        #イベントをデータベースから探す
+        event = Event.objects.filter(id=event_id).first()
+        
+        #イベントがない：エラー出力
+        if event is None:
+            return JsonResponse({'エラー': '指定されたイベントは存在しません。'})
+        
+        #参加者をデータベースから取得
+        participants = Participant.objects.filter(event=event)
+        
+        #データ作成JSON形式
+        data = {
+            'イベント名': event.name,
+            '日付': event.date.isoformat(),
+            '支払総額': str(event.total_amount),
+            '徴収額': str(event.total_amount / participants.count()),
+            '参加者': [{
+                'ユーザー名': participant.user.username,
+                '預かった金額': str(participant.paid_amount),
+                '返す金額': str(participant.paid_amount - (event.total_amount / participants.count())),
+            } for participant in participants]
+        }
+        
+        #JSON形式でクライアントに返す
+        return JsonResponse(data, safe=False)
