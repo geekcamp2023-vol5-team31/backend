@@ -11,6 +11,7 @@ def save_data(request,user_id):
         user_id = get_github_user_id(user_id)
         if not user_id:
             return JsonResponse({'error': 'ユーザが認証失敗'}, status=401)
+        
         json_data = request.POST.get('data') #フロントから渡されるデータ
         data = json.loads(json_data)         #json解析
         Event.objects.create(data=data)      #データベースに保存
