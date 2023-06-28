@@ -1,8 +1,22 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from .models import Event, Participant
-import requests
+import requests,json
 
+#データ保存用
+def save_data(request,user_id):
+    #POST
+    if request.method == 'POST':
+        # ユーザ認証
+        user_id = get_github_user_id(user_id)
+        if not user_id:
+            return JsonResponse({'error': 'ユーザが認証失敗'}, status=401)
+        
+        json_data = request.POST.get('data') #フロントから渡されるデータ
+        data = json.loads(json_data)         #json解析
+        Event.objects.create(data=data)      #データベースに保存
+        return JsonResponse({'success': True})  #成功レンスポンス
+    
 #保存イベント一覧：
 def event_list(request):
     user_id = get_github_user_id(request.META.get("HTTP_AUTHORIZATION"))
