@@ -4,8 +4,8 @@ from .models import Event, Participant
 import requests
 
 #保存イベント一覧：
-def event_list(request, user_id):
-    user_id = get_github_user_id(user_id)
+def event_list(request):
+    user_id = get_github_user_id(request.META.get("HTTP_AUTHORIZATION"))
     events = Event.objects.all()
     event_list = []
     for event in events:
