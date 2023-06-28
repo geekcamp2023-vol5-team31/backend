@@ -19,36 +19,15 @@ def save_data(request,user_id):
     
 #保存イベント一覧：
 def event_list(request, user_id):
-    user_id = get_github_user_id(user_id)
+    auth_token = get_github_user_id(request.META.get("HTTP_AUTHORIZATION"))
+    access_token = auth_token.split(' ')[1]
+    user_id = get_github_user_id(access_token)
     events = Event.objects.all()
     event_list = []
     for event in events:
         if event.user == user_id:
             event_list.append(event.data)
     return JsonResponse(event_list, safe=False)
-
-#イベント詳細情報
-def event_detail(request, event_id):
-    event = get_object_or_404(Event, pk=event_id)  
-    participants = Participant.objects.filter(event=event)
-    participant_list = []
-    
-    #データJSON形式
-    for participant in participants:
-        participant_data = {
-            'name': participant.user.username,
-            'paid_amount': str(participant.paid_amount),
-            'collection_amount': str(participant.collection_amount),
-            'return_amount': str(participant.return_amount)
-        }
-        participant_list.append(participant_data)
-    event_data = {
-        'event_name': event.name,
-        'date': event.date.strftime('%Y/%m/%d'),
-        'participants': participant_list
-    }
-    #JSON形式でクライアントに返す
-    return JsonResponse(event_data, safe=False)
 
 #github api
 def get_github_user_id(access_token):
