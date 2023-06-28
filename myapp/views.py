@@ -4,15 +4,13 @@ from .models import Event, Participant
 import requests
 
 #保存イベント一覧：
-def event_list(request):
+def event_list(request, user_id):
+    user_id = get_github_user_id(user_id)
     events = Event.objects.all()
     event_list = []
     for event in events:
-        event_list.append({
-            'id': event.data.get('id'),
-            'date': event.data.get('date'),
-            'name': event.data.get('name')
-        })
+        if event.user == user_id:
+            event_list.append(event.data)
     return JsonResponse(event_list, safe=False)
 
 #イベント詳細情報
