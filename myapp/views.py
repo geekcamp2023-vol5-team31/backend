@@ -4,7 +4,7 @@ from .models import Event, Participant
 import requests,json
 
 #データ保存用
-def sava_data(request,user_id):
+def save_data(request,user_id):
     #POST
     if request.method == 'POST':
         # ユーザ認証
