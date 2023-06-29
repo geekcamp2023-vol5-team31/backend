@@ -3,7 +3,7 @@ from .models import Event
 import requests,json
 
 #githubユーザ認証
-@csrf_exempt
+# @csrf_exempt
 def get_github_user_id(access_token):
     headers = {
         'Authorization': f'Bearer {access_token}',
