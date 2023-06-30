@@ -4,6 +4,7 @@ import requests,json
 from django.middleware.csrf import get_token
 
 #githubユーザ認証
+# @csrf_exempt
 def get_github_user_id(access_token):
     headers = {
         'Authorization': f'Bearer {access_token}',
@@ -31,11 +32,11 @@ def save_data(request):
         if len(tmp) == 0: 
             data = json.loads(request.body)
             Event.objects.create(user=user_id, data=data)
-            return JsonResponse({'success1': True})
+            return JsonResponse({'success': True})
         else:
             data = json.loads(request.body)         #json解析
             Event.objects.create(data=data)      #データベースに保存
-            return JsonResponse({'success2': True})  #成功レンスポンス
+            return JsonResponse({'success': True})  #成功レンスポンス
     
 #保存イベント一覧：
 def event_list(request):
