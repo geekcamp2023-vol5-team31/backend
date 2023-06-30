@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from .models import Event
 import requests,json
+from django.middleware.csrf import get_token
 
 #githubユーザ認証
 def get_github_user_id(access_token):
@@ -16,38 +17,34 @@ def get_github_user_id(access_token):
     else:
         return None
 
+def CsrfToken(request):
+    return JsonResponse({"token": get_token(request)})
+
 #データ保存用
 def save_data(request):
     #POST
     if request.method == 'POST':
         # ユーザ認証
         auth_token = request.META.get("HTTP_AUTHORIZATION")
-        user_id = get_github_user_id(auth_token.split("")[1])
-        if not user_id: 
-            json_data = request.POST.get('data')
-            data = json.loads(json_data)
+        user_id = get_github_user_id(auth_token.split(" ")[1])
+        tmp = Event.objects.filter(user=user_id)
+        if len(tmp) == 0: 
+            data = json.loads(request.body)
             Event.objects.create(user=user_id, data=data)
-            return JsonResponse({'success': True})
+            return JsonResponse({'success1': True})
         else:
-            json_data = request.POST.get('data') #フロントから渡されるデータ
-            data = json.loads(json_data)         #json解析
+            data = json.loads(request.body)         #json解析
             Event.objects.create(data=data)      #データベースに保存
-            return JsonResponse({'success': True})  #成功レンスポンス
+            return JsonResponse({'success2': True})  #成功レンスポンス
     
 #保存イベント一覧：
-def event_list(request, user_id):
+def event_list(request):
     # ユーザ認証
-    user_id = get_github_user_id(user_id)
-    
-    #↓おかしい？
-    # auth_token = get_github_user_id(request.META.get("HTTP_AUTHORIZATION"))
-    # access_token = auth_token.split(' ')[1]
-    # user_id = get_github_user_id(access_token)
-    events = Event.objects.all()#Event取り出す
+    auth_token = request.META.get("HTTP_AUTHORIZATION")
+    access_token = auth_token.split(' ')[1]
+    user_id = get_github_user_id(access_token)
+    event_lists = Event.objects.filter(user=user_id).all()
     event_list = []
-    for event in events:#user_idと一致するか
-        if event.user == user_id:
-            event_list.append(event.data)
-            
+    for event in event_lists:
+        event_list.append(json.dumps(event.data))
     return JsonResponse(event_list, safe=False)#イベントリストを返す
-
