@@ -37,8 +37,10 @@ def create_event(request):
             return JsonResponse({'error': 'Invalid user or access token.'}, status=400)
         
         data = json.loads(request.body)
-        event = Event.objects.create(user=user_id, data=data)
-        return JsonResponse({'event_id': event.id, 'data': data['data']})
+        event_name = data.get('event_name', 'Event Name')
+        timestamp = data.get('timestamp', '2023-01-01T00:00:00')
+        event = Event.objects.create(user=user_id, event_name=event_name,timestamp=timestamp,data=data)
+        return JsonResponse({'id': event.id,})
     
 # イベント一覧を取得
 def get_events(request):
@@ -48,12 +50,13 @@ def get_events(request):
         return JsonResponse({'error': 'Invalid user or access token.'}, status=400)
     
     #データベースからユーザーに関連するイベントを取得
-    events = Event.objects.filter(user=user_id).values('id', 'data')
+    events = Event.objects.filter(user=user_id).values('id','event_name','timestamp')
     event_list = []
     for event in events:
         event_list.append({
             'id': event['id'],
-            'data': event['data']
+            'event_name': event['event_name'],
+            'timestamp': event['timestamp']
         })
     return JsonResponse(event_list, safe=False)
 
@@ -93,6 +96,8 @@ def event_update(request, event_id):
         json_data = json.loads(request.body)
         data = json_data.get("data")
         if data:
+            event.event_name = json_data.get("event_name", event.event_name)
+            event.timestamp = json_data.get("timestamp", event.timestamp)
             event.data = data
             event.save()
             return JsonResponse({'message': 'Event updated successfully'})
