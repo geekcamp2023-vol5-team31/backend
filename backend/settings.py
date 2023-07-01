@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     #追加
+    'line_bot',
     'myapp', 
     'django.contrib.sites',
     'allauth',
@@ -124,13 +125,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -148,3 +149,5 @@ SITE_ID = 1
 CORS_ORIGIN_WHITELIST = [
     'https://github.com',  # GitHubのURL
 ]
+
+ALLOWED_HOSTS = ['2ed8-115-31-39-178.jp.ngrok.io']
