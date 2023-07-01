@@ -1,89 +1,160 @@
 # backend
 技育キャンプvol5 バックエンドリポ
 
+# json形式
+
+    {
+        'event_name':"イベント名",
+        'timestamp': '2023-07-01T00:00:00',
+        'total':合計金額,
+        'data': [
+            {
+                'name': '参加者名1',
+                'amount': 金額1,
+            },
+            {
+                'name': '参加者名2',
+                'amount': 金額2,
+            },
+            .
+            .
+            .
+        ]
+    }
 # API利用方法
-## イベントデータの保存：
-__エンドポイント:__ /myapp/save_data/
+
+##
+イベント新規作成: POST /myapp/create_event/
+
+イベント一覧を取得: GET /myapp/get_events/
+
+イベントの詳細を取得: GET /myapp/get_event_detail/<int:event_id>/
+
+イベントの更新: PUT /myapp/event_update/<int:event_id>/
+
+---
+## イベント新規作成：
+__エンドポイント:__ /myapp/create_event/
 
 __HTTPメソッド:__ POST
 
-__ヘッダー:__
-
-- Authorization: Bearer {GitHubアクセストークン}
-- Content-Type: application/json
+__ヘッダー:__　Authorization: Bearer [アクセストークン]
   
-__ボディー:__ イベントデータを表すJSONオブジェクト
+__ボディー:__ JSONデータ（イベント名,作成日,合計金額,参加者名，徴収金額）
 
-__レスポンス:__  { 'success': True }
+__レスポンス:__
+
+    status=200
+    {
+        "event_id": [イベントID],
+    }
+
+__エラーレスポンス:__
+
+    status=400
+    {
+        "error": "Invalid user or access token."
+    }
+
 ***
-## イベントデータの取得：
+## イベント一覧取得：
 
-__エンドポイント:__ /myapp/event_list/
+__エンドポイント:__ /myapp/get_events/
 
 __HTTPメソッド:__  GET
 
-__ヘッダー:__ Authorization: Bearer {GitHubアクセストークン}
+__ヘッダー:__ Authorization: Bearer [アクセストークン]
 
-__レスポンス:__ 認証されたユーザーに関連付けられたすべてのイベントデータを含むJSON配列
+__レスポンス:__ 
+
+    status=200
+    [
+        {'id': 1, 'event_name': 'イベント名1', 'timestamp': '2023-07-01T00:00:00'},
+        {'id': 2, 'event_name': 'イベント名2', 'timestamp': '2023-08-01T00:00:00'}, 
+        ...
+    ]
+
+__エラーレスポンス:__
+
+    status=400
+    {
+        "error": "Invalid user or access token."
+    }
+
 ***
-## CSRFトークンの取得：
-__エンドポイント:__ /myapp/csrf_token/
+## イベント詳細取得：
+__エンドポイント:__ /myapp/get_event_detail/<int:event_id>/
 
 __HTTPメソッド:__  GET
 
-__レスポンス:__ { "token": {CSRFトークン} }
+__ヘッダー:__ Authorization: Bearer [アクセストークン]
 
-# myapp/views.py
-### get_github_user_id(access_token):
-  
-GitHub アクセストークンを使用して GitHub API からユーザーIDを取得
+__レスポンス:__ 
 
-- 入力
-  
-    access_token: (string) GitHub API にリクエストを送るための認証用アクセストークン
+    status=200
+    {
+        'event_id': 49, 
+        'event_name':"イベント名",
+        'timestamp': '2023-07-01T00:00:00',
+        'total':合計金額,
+        'data': [
+            {
+                'name': 'UpdatedParticipant1',
+                'amount': 10
+            }, 
+            {
+                'name': 'UpdatedParticipant2', 
+                'amount': 20
+            }
+            .
+            .
+            .
+        ]
+    }
 
-- 出力
-  
-    成功時：ユーザーID（整数型）
+__エラーレスポンス：__
 
-    失敗時（HTTPステータスコードが200以外の場合）：None
+    status=400
+    {
+        "error": "Invalid user or access token."
+    }
+    status=404
+    {
+        'error': 'Event not found' 
+    }
 
-### save_data(request):
-ユーザーから受け取ったデータはイベントとして保存
-イベントは特定のGitHubユーザーIDに関連付ける
-- 入力
+---
+## イベント更新：
+__エンドポイント:__ /myapp/event_update/<int:event_id>/
 
-    request: クライアントからのHTTPリクエスト情報
+__HTTPメソッド:__  PUT
+
+__ヘッダー:__ Authorization: Bearer [アクセストークン]
+
+
+__レスポンス:__
+
+    status=200
+    {
+        "message": "Event updated successfully"
+    }
+
+__エラーレスポンス:__
+
+    status=400
+    {
+        'error': 'Invalid data'
+    }
+    status=400
+    {
+        'error': 'Invalid request method'
+    }
+    status=400
+    {
+        "error": "Invalid user or access token."
+    }
+    status=404
+    {
+        'error': 'Event not found'
+    }
     
-- 出力
-
-    成功時：JSON形式 {'success': True} となる
-
-
-### event_list(request):
-  
-ユーザーは自身のイベントリストを取得
-
-これらのイベントは、ユーザーIDによってフィルタリングされ
-る
-
-- 入力
-
-    request: クライアントからのHTTPリクエスト情報
-
-- 出力
-
-     ユーザーに関連付けられたすべての Event オブジェクトのデータを含むJSON形式
-
-### csrf_token(request):
-  
-DjangoのCSRFトークンを取得し、そのトークンをJSON形式で返す
-- 入力
-  
-
-    request: クライアントからのHTTPリクエスト情報
-
-
-- 出力
-
-    key:"token"、value:"CSRFトークン"のJSON形式
