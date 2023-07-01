@@ -1,10 +1,10 @@
-from django.http import JsonResponse, HttpResponseNotAllowed
+from django.http import JsonResponse
 from .models import Event
 import requests,json
-# from django.views.decorators.csrf import csrf_protect,csrf_exempt
-
+from django.middleware.csrf import get_token
 
 #githubユーザ認証
+# @csrf_exempt
 def get_github_user_id(access_token):
     headers = {
         'Authorization': f'Bearer {access_token}',
@@ -18,41 +18,34 @@ def get_github_user_id(access_token):
     else:
         return None
 
+def CsrfToken(request):
+    return JsonResponse({"token": get_token(request)})
+
 #データ保存用
 def save_data(request):
+    #POST
     if request.method == 'POST':
+        # ユーザ認証
         auth_token = request.META.get("HTTP_AUTHORIZATION")
         user_id = get_github_user_id(auth_token.split(" ")[1])
-
-        if not user_id:
-            json_data = request.POST.get('data')
-            data = json.loads(json_data)
+        tmp = Event.objects.filter(user=user_id)
+        if len(tmp) == 0: 
+            data = json.loads(request.body)
             Event.objects.create(user=user_id, data=data)
             return JsonResponse({'success': True})
-
         else:
-            json_data = request.POST.get('data')
-            data = json.loads(json_data)
-            Event.objects.create(user=user_id, data=data)
-            return JsonResponse({'success': True})
-
-    # POSTメソッド以外の場合はHTTP 405 Method Not Allowedを返す
-    return HttpResponseNotAllowed(['POST'])
+            data = json.loads(request.body)         #json解析
+            Event.objects.create(data=data)      #データベースに保存
+            return JsonResponse({'success': True})  #成功レンスポンス
     
 #保存イベント一覧：
-def event_list(request, user_id):
+def event_list(request):
     # ユーザ認証
     auth_token = request.META.get("HTTP_AUTHORIZATION")
-    user_id = get_github_user_id(auth_token.split(' ')[1])
-    
-    # events = Event.objects.all()#Event取り出す
-    # event_list = []
-    # for event in events:#user_idと一致するか
-    #     if event.user == user_id:
-    #         event_list.append(event.data)
-    
-    events = Event.objects.filter(user=user_id)  # ユーザIDに紐づくイベントを取得
-    event_list = [event.data for event in events]
-            
+    access_token = auth_token.split(' ')[1]
+    user_id = get_github_user_id(access_token)
+    event_lists = Event.objects.filter(user=user_id).all()
+    event_list = []
+    for event in event_lists:
+        event_list.append(json.dumps(event.data))
     return JsonResponse(event_list, safe=False)#イベントリストを返す
-
