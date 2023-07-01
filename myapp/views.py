@@ -4,7 +4,6 @@ import requests,json
 from django.middleware.csrf import get_token
 
 #githubユーザ認証
-# @csrf_exempt
 def get_github_user_id(access_token):
     headers = {
         'Authorization': f'Bearer {access_token}',
@@ -18,7 +17,7 @@ def get_github_user_id(access_token):
     else:
         return None
 
-def CsrfToken(request):
+def csrf_token(request):
     return JsonResponse({"token": get_token(request)})
 
 #データ保存用
