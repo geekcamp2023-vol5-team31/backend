@@ -5,3 +5,5 @@ myapp/migrations/__pycache__/
 
 #database
 db.sqlite3
+
+test.py
