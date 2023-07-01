@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
+    # 'social_django'
     # 'corsheaders'
     
     'django.contrib.admin',
@@ -49,10 +50,10 @@ INSTALLED_APPS = [
 ]
 
 # OAuth認証用に追加
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'social_core.backends.github.GithubOAuth2',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'social_core.backends.github.GithubOAuth2',
+# ]
 
 SOCIAL_AUTH_GITHUB_KEY = 'Client ID'
 SOCIAL_AUTH_GITHUB_SECRET = 'Client Secret'
