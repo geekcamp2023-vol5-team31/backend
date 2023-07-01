@@ -3,7 +3,6 @@ from django.views.decorators.csrf import csrf_exempt
 from linebot import WebhookHandler, LineBotApi
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage
-import requests, json
 
 CHANNEL_SECRET = 'd4307b8e64fd86590d3e92bb952e0eaa'
 CHANNEL_ACCESS_TOKEN = '9U5QyS3exnmcxKYVZf5UvJ62Z6sSA6ZJxNFb6EOWtP7KAXGz4cqHdlqMxswrETYP6ddii8lZNoFpiA7stVdDC2LoswquJnSc5c2r7IR7JJUuLVYgZ42TkPEzlt6eZ7PsTH2ph3tb27doL7iU1z5HVwdB04t89/1O/w1cDnyilFU='
@@ -48,11 +47,18 @@ def handle_text_message(event):
         )
         flag = "add"
     elif event.message.text == "終了":
+        response = ""
+        m = int(sum) / len(moneys)
         for name, money in moneys.items():
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextMessage(text=f"{name}さんが{money}円")
+            response += f"{name}さん{round(float(money)-m)}円\n"
+        response = response.rstrip("\n")
+        print(type(response))
+        line_bot_api.reply_message(
+            event.reply_token, 
+            TextMessage(
+                text=f"お釣りは\n{response}"
             )
+        )
         flag = "off"
     elif flag == "add":
         profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
