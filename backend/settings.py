@@ -39,9 +39,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.github',
-    # 'social_django'
-    # 'corsheaders'
-    
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -50,11 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
-# OAuth認証用に追加
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-#     'social_core.backends.github.GithubOAuth2',
-# ]
 
 SOCIAL_AUTH_GITHUB_KEY = 'Client ID'
 SOCIAL_AUTH_GITHUB_SECRET = 'Client Secret'
@@ -67,9 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    
-    # 'corsheaders.middleware.CorsMiddleware',
-    # 'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -94,9 +85,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -123,8 +111,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'ja'
 
@@ -149,6 +135,13 @@ SITE_ID = 1
 
 CORS_ORIGIN_WHITELIST = [
     'https://github.com',  # GitHubのURL
+    "http://localhost:3000",
+    'http://127.0.0.1:3000'
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000"
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = ['58f0-115-31-39-178.jp.ngrok.io',"localhost","127.0.0.1"]
