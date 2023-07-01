@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from linebot import WebhookHandler, LineBotApi
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage
-import requests
+import requests, json
 
 CHANNEL_SECRET = 'd4307b8e64fd86590d3e92bb952e0eaa'
 CHANNEL_ACCESS_TOKEN = '9U5QyS3exnmcxKYVZf5UvJ62Z6sSA6ZJxNFb6EOWtP7KAXGz4cqHdlqMxswrETYP6ddii8lZNoFpiA7stVdDC2LoswquJnSc5c2r7IR7JJUuLVYgZ42TkPEzlt6eZ7PsTH2ph3tb27doL7iU1z5HVwdB04t89/1O/w1cDnyilFU='
@@ -26,9 +26,35 @@ def callback(request):
             return HttpResponseForbidden()
         return HttpResponse(status=200)
 
+flag = "off"
+sum = 0
+moneys = {}
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     """リプライ用 テキストが届いたら動く処理"""
-    sum = 0
+    global flag, sum, moneys
     if event.message.text == "わりかんじ":
-        response = requests.get("https://api.line.me/v2/bot/group/{groupId}/members/count")
+        line_bot_api.reply_message(
+            event.reply_token, 
+            TextMessage(text="割り勘を開始します。\n合計金額を入力してください。")
+        )
+        flag = "sum"
+    elif flag == "sum":
+        sum = event.message.text
+        line_bot_api.reply_message(
+            event.reply_token, 
+            TextMessage(text="個人の金額を入力してください。")
+        )
+        flag = "add"
+    elif event.message.text == "終了":
+        for name, money in moneys.items():
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextMessage(text=f"{name}さんが{money}円")
+            )
+        flag = "off"
+    elif flag == "add":
+        profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
+        profile = profile.as_json_dict()
+        moneys[profile["displayName"]] = event.message.text
