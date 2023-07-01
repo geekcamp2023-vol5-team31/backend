@@ -4,6 +4,8 @@ import requests,json
 from django.middleware.csrf import get_token
 from django.core import serializers
 
+
+# -----------------追加分----------------------------
 #githubユーザ認証
 def get_github_user_id(request,access_token):
     if 'user_id' in request.session:
@@ -54,6 +56,17 @@ def get_event_detail(request, event_id):
     else:
         return JsonResponse({'error': 'Event not found'}, status=404)
 
+#イベント新規作成
+def create_event(request):
+    if request.method == 'POST':
+        auth_token = request.META.get("HTTP_AUTHORIZATION")
+        user_id = get_github_user_id(auth_token.split(" ")[1])
+        
+        data = json.loads(request.body)
+        event = Event.objects.create(user=user_id, data=data)
+        return JsonResponse({'event_id': event.id})
+
+# ----------------------------------------------------
 #データ保存用
 def save_data(request):
     #POST
