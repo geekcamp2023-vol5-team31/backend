@@ -42,6 +42,7 @@ __ヘッダー:__　Authorization: Bearer [アクセストークン]
 __ボディー:__ JSONデータ（イベント名,作成日,参加者名，金額）
 
 __レスポンス:__
+
     status=200
     {
         "event_id": [イベントID],
@@ -130,6 +131,7 @@ __ヘッダー:__ Authorization: Bearer [アクセストークン]
 
 
 __レスポンス:__
+
     status=200
     {
         "message": "Event updated successfully"
