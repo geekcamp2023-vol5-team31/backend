@@ -95,8 +95,8 @@ __レスポンス:__
     {
         'event_id': 49, 
         'event_name':"イベント名",
-        'total':合計金額,
         'timestamp': '2023-07-01T00:00:00',
+        'total':合計金額,
         'data': [
             {
                 'name': 'UpdatedParticipant1',
