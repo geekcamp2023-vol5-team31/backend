@@ -125,6 +125,7 @@ __エラーレスポンス：__
 
 ---
 ## イベント更新：
+
 __エンドポイント:__ /myapp/event_update/<int:event_id>/
 
 __HTTPメソッド:__  PUT
@@ -157,4 +158,3 @@ __エラーレスポンス:__
     {
         'error': 'Event not found'
     }
-    
