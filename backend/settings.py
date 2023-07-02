@@ -141,4 +141,4 @@ CORS_ORIGIN_WHITELIST = [
     'https://github.com',  # GitHubのURL
 ]
 
-ALLOWED_HOSTS = ['58f0-115-31-39-178.jp.ngrok.io']
+ALLOWED_HOSTS = ['58f0-115-31-39-178.jp.ngrok.io',"localhost","127.0.0.1"]
