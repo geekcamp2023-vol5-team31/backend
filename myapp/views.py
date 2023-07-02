@@ -77,8 +77,9 @@ def get_event_detail(request, event_id):
     event = Event.objects.filter(user=user_id, id=event_id).first()
     #ある場合データを返す
     if event:
+        total = event.total
         event_data = event.data
-        return JsonResponse({'event_id': event_id, 'data': event_data}, encoder=DjangoJSONEncoder)
+        return JsonResponse({'event_id': event_id, 'total':total,'data': event_data}, encoder=DjangoJSONEncoder)
     # ない場合：エラー
     else:
         return JsonResponse({'error': 'Event not found'}, status=404)
