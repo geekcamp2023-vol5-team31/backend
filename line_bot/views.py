@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from linebot import WebhookHandler, LineBotApi
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage
+import requests, json
 
 CHANNEL_SECRET = 'd4307b8e64fd86590d3e92bb952e0eaa'
 CHANNEL_ACCESS_TOKEN = '9U5QyS3exnmcxKYVZf5UvJ62Z6sSA6ZJxNFb6EOWtP7KAXGz4cqHdlqMxswrETYP6ddii8lZNoFpiA7stVdDC2LoswquJnSc5c2r7IR7JJUuLVYgZ42TkPEzlt6eZ7PsTH2ph3tb27doL7iU1z5HVwdB04t89/1O/w1cDnyilFU='
@@ -28,11 +29,12 @@ def callback(request):
 flag = "off"
 sum = 0
 moneys = {}
+response = ""
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_text_message(event):
     """リプライ用 テキストが届いたら動く処理"""
-    global flag, sum, moneys
+    global flag, sum, moneys, response
     if event.message.text == "わりかんじ":
         line_bot_api.reply_message(
             event.reply_token, 
@@ -46,7 +48,8 @@ def handle_text_message(event):
             TextMessage(text="個人の金額を入力してください。")
         )
         flag = "add"
-    elif event.message.text == "終了":
+    elif event.message.text == "終了" and flag != "off":
+        m = int(sum) / len(moneys)
         for name, money in moneys.items():
             response += f"{name}さん{round(float(money)-m)}円\n"
         response = response.rstrip("\n")
@@ -57,6 +60,22 @@ def handle_text_message(event):
             ))
         flag = "off"
     elif flag == "add":
+        headers = {
+            "Authorization": f"Bearer {CHANNEL_ACCESS_TOKEN}"
+        }
+        r = requests.get(f"https://api.line.me/v2/bot/group/{event.source.group_id}/members/count", headers=headers)
+        user_count = r.json()
         profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
         profile = profile.as_json_dict()
         moneys[profile["displayName"]] = event.message.text
+        if user_count["count"] == len(moneys):
+            m = int(sum) / len(moneys)
+            for name, money in moneys.items():
+                response += f"{name}さん{round(float(money)-m)}円\n"
+            response = response.rstrip("\n")
+            line_bot_api.reply_message(
+                event.reply_token, 
+                TextMessage(
+                    text=f"終了\nお釣りは\n{response}"
+                ))
+            flag = "off"
