@@ -63,10 +63,6 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST =[
-    '*',
-]
-
 ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
@@ -139,6 +135,13 @@ SITE_ID = 1
 
 CORS_ORIGIN_WHITELIST = [
     'https://github.com',  # GitHubのURL
+    "http://localhost:3000",
+    'http://127.0.0.1:3000'
 ]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000"
+]
+CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = ['58f0-115-31-39-178.jp.ngrok.io',"localhost","127.0.0.1"]
