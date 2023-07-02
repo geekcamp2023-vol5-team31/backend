@@ -52,7 +52,6 @@ def handle_text_message(event):
         for name, money in moneys.items():
             response += f"{name}さん{round(float(money)-m)}円\n"
         response = response.rstrip("\n")
-        print(type(response))
         line_bot_api.reply_message(
             event.reply_token, 
             TextMessage(

@@ -44,6 +44,8 @@ def create_event(request):
         
         event = Event.objects.create(user=user_id, event_name=event_name,timestamp=timestamp,total=total,data=data)
         return JsonResponse({'id': event.id,})
+    else:
+        return None
     
 # イベント一覧を取得
 def get_events(request):
