@@ -47,8 +47,6 @@ def handle_text_message(event):
         )
         flag = "add"
     elif event.message.text == "終了":
-        response = ""
-        m = int(sum) / len(moneys)
         for name, money in moneys.items():
             response += f"{name}さん{round(float(money)-m)}円\n"
         response = response.rstrip("\n")
@@ -56,8 +54,7 @@ def handle_text_message(event):
             event.reply_token, 
             TextMessage(
                 text=f"お釣りは\n{response}"
-            )
-        )
+            ))
         flag = "off"
     elif flag == "add":
         profile = line_bot_api.get_group_member_profile(event.source.group_id, event.source.user_id)
