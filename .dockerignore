@@ -1,14 +1,8 @@
-# Ignore Python bytecode files
-*.pyc
-*__pycache__
 
-# Ignore git directory and files
-.git
-.gitignore
-
-# Ignore SQLite database file
-db.sqlite3
-
+# Ignore temporary files, logs and local configuration files
+*.log
+*.tmp
+*.local
 # Ignore temporary files, logs and local configuration files
 *.log
 *.tmp

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponse
 
@@ -133,15 +134,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SITE_ID = 1
 
-CORS_ORIGIN_WHITELIST = [
-    'https://github.com',  # GitHubのURL
-    "http://localhost:3000",
-    'http://127.0.0.1:3000'
-]
+CORS_ORIGIN_WHITELIST = os.environ['ORIGIN']
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000"
-]
+CSRF_TRUSTED_ORIGINS = os.environ['ORIGIN']
 CORS_ALLOW_CREDENTIALS = True
 
-ALLOWED_HOSTS = ['58f0-115-31-39-178.jp.ngrok.io',"localhost","127.0.0.1"]
+ALLOWED_HOSTS = os.environ['HOST']
