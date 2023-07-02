@@ -34,3 +34,4 @@ tzdata==2023.3
 urllib3==2.0.3
 utils==1.0.1
 yarl==1.9.2
+django-cors-headers==4.1.0
