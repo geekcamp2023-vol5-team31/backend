@@ -79,7 +79,7 @@ def get_event_detail(request, event_id):
     if event:
         total = event.total
         event_data = event.data
-        return JsonResponse({'event_id': event_id, 'total':total,'data': event_data}, encoder=DjangoJSONEncoder)
+        return JsonResponse({'event_id': event_id, 'total':total,'data': event_data,"event_name": event.event_name}, encoder=DjangoJSONEncoder)
     # ない場合：エラー
     else:
         return JsonResponse({'error': 'Event not found'}, status=404)
