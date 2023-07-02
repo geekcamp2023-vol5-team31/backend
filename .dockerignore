@@ -1,0 +1,16 @@
+# Ignore Python bytecode files
+*.pyc
+*__pycache__
+
+venv
+# Ignore git directory and files
+.git
+.gitignore
+.idea
+# Ignore SQLite database file
+db.sqlite3
+
+# Ignore temporary files, logs and local configuration files
+*.log
+*.tmp
+*.local
